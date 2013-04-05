@@ -23,7 +23,7 @@ namespace hzw
          inline Queue();
          inline ~Queue();
          inline void clear();
-         inline void enqueue(const Data &dt);
+         inline void enqueue(Data dt);
          inline Data onFront() const;
          inline Data onBack() const;
          inline void dequeue();
@@ -69,7 +69,7 @@ namespace hzw
    }
 
    template<typename Data>
-   void Queue<Data>::enqueue(const Data &dt)
+   void Queue<Data>::enqueue(Data dt)
    {
       pimpl->enqueue((void *) &dt, sizeof(Data));
    }
