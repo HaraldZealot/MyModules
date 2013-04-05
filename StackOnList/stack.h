@@ -14,8 +14,8 @@ namespace hzw
          inline Stack<Data> &operator= (const Stack<Data> &roperand);
          inline ~Stack();
          inline void clear();
-         inline void push(const Data &dt);
-         inline void onTop(Data &dt) const;
+         inline void push(Data dt);
+         inline Data onTop() const;
          inline void pop();
          inline bool isEmpty() const;
       private:
@@ -57,15 +57,17 @@ namespace hzw
    }
 
    template<typename Data>
-   void Stack<Data>::push(const Data &dt)
+   void Stack<Data>::push(Data dt)
    {
       pimpl->push((void *) &dt, sizeof(Data));
    }
 
    template<typename Data>
-   void Stack<Data>::onTop(Data &dt) const
+   Data Stack<Data>::onTop() const
    {
+      Data dt;
       pimpl->onTop((void *) &dt);
+      return dt;
    }
 
    template<typename Data>

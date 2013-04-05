@@ -7,7 +7,7 @@ using namespace hzw;
 int main()
 {
    ifstream fin("test.in");
-   Stack<int> s;
+   Stack<int> s,s1;
 
    while(!fin.eof())
    {
@@ -26,11 +26,10 @@ int main()
             if(s.isEmpty())
             {
                cout << "error ";
-               s.onTop(num);
             }
             else
             {
-               s.onTop(num);
+               num=s.onTop();
                s.pop();
                cout << num << ' ';
             }
