@@ -1,10 +1,21 @@
 #ifndef QUEUE_H
 #define QUEUE_H
 
-#include "queueimplementation.h"
+#include <exception>
 
 namespace hzw
 {
+   class QueueVoid;
+   class QueueImplementation;
+
+   class QueueException: public std::exception
+   {
+         const char *what() const throw()
+         {
+            return "hzw::read_from_empty_queue";
+         }
+   };
+
    template <typename Data>
    class Queue
    {
@@ -13,10 +24,25 @@ namespace hzw
          inline ~Queue();
          inline void clear();
          inline void enqueue(const Data &dt);
-         inline void onFront(Data &dt) const;
-         inline void onBack(Data &dt) const;
+         inline Data onFront() const;
+         inline Data onBack() const;
          inline void dequeue();
          inline bool isEmpty() const;
+      private:
+         QueueVoid *pimpl;
+   };
+
+   class QueueVoid
+   {
+      public:
+         QueueVoid();
+         ~QueueVoid();
+         void clear();
+         void enqueue(const void *dtAdress, int dtSize);
+         void onFront(void *dtAdress) const;
+         void onBack(void *dtAdress) const;
+         void dequeue();
+         bool isEmpty() const;
       private:
          QueueImplementation *pimpl;
    };
@@ -25,7 +51,7 @@ namespace hzw
    Queue<Data>::Queue() :
       pimpl(0)
    {
-      pimpl = new QueueImplementation;
+      pimpl = new QueueVoid;
    }
 
    template<typename Data>
@@ -49,15 +75,21 @@ namespace hzw
    }
 
    template<typename Data>
-   void Queue<Data>::onFront(Data &dt) const
+   Data Queue<Data>::onFront() const
    {
+      Data dt;
       pimpl->onFront((void *) &dt);
+      return dt;
    }
 
    template<typename Data>
-   void Queue<Data>::onBack(Data &dt) const
+   Data Queue<Data>::onBack() const
    {
-      pimpl->onBack((void *) &dt);
+      Data *dt=(Data *)(new unsigned char[sizeof(Data)]);
+      pimpl->onBack((void *) dt);
+      Data dt1(*dt);
+      delete [] (unsigned char)dt;
+      return dt1;
    }
 
    template<typename Data>

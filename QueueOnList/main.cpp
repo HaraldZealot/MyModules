@@ -29,7 +29,7 @@ int main()
             }
             else
             {
-               q.onFront(num);
+               num=q.onFront();
                q.dequeue();
                cout << num << ' ';
             }
