@@ -8,8 +8,9 @@ class Proba
 {
       int n;
       double *coord;
-   public:
       Proba();
+   public:
+      Proba(int nn);
       Proba(const Proba &original);
       Proba &operator= (const Proba &roperand);
       ~Proba();
@@ -19,13 +20,16 @@ class Proba
 int main()
 {
    Queue<Proba> q;
-   Proba a;
-   cout<<"\n\na:\n"<<a;
+   Proba a(3);
+   cout << "\n\na:\n" << a;
    q.enqueue(a);
-   cout<<"on back\n"<<q.onBack();
-   cout<<"between calls\n";
-   cout<<"on front\n"<<q.onFront();
-   cout<<"before return\n";
+   cout << "on back\n" << q.onBack();
+   cout << "after onBack\n";
+   cout << "\n\na:\n" << a;
+   cout << "on front\n" << q.onFront();
+   cout << "after onFront\n";
+   cout << "\n\na:\n" << a;
+   cout << "before return\n";
 
    /*ifstream fin("test.in");
    Queue<int> q;
@@ -79,6 +83,16 @@ Proba::Proba():
    cout << "empty constructor\n";
 }
 
+Proba::Proba(int nn):
+   n(nn),
+   coord(0)
+{
+   coord = new double[n];
+   for(int i=0;i<n;++i)
+      coord[i]=2.0+0.1*(i+1);
+   cout << "empty constructor\n";
+}
+
 Proba::Proba(const Proba &original):
    n(original.n),
    coord(0)
@@ -115,9 +129,20 @@ Proba &Proba::operator= (const Proba &roperand)
 
 Proba::~Proba()
 {
+   cout << "in destructor\n";
+   cout << "n=" << n << endl;
+
+   for(int i = 0; i < n; ++i)
+      cout << coord[i] << endl;
+
    delete [] coord;
-   coord=0;
+   coord = 0;
    n = 0;
+   cout << "n=" << n << endl;
+
+   for(int i = 0; i < n; ++i)
+      cout << coord[i] << endl;
+
    cout << "destructor\n";
 }
 
