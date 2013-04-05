@@ -92,9 +92,9 @@ namespace hzw
    template<typename Data>
    Data Stack<Data>::onTop() const
    {
-      Data dt;
-      pimpl->onTop((void *) &dt);
-      return dt;
+      unsigned char *bufer=new unsigned char[sizeof(Data)];
+      pimpl->onBack((void *) bufer);
+      return *((Data *)bufer);
    }
 
    template<typename Data>
