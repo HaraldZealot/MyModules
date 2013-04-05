@@ -8,7 +8,7 @@ class Proba
 {
       int n;
       double *coord;
-      Proba();
+     // Proba();
    public:
       Proba(int nn);
       Proba(const Proba &original);
