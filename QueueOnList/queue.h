@@ -78,9 +78,9 @@ namespace hzw
    template<typename Data>
    Data Queue<Data>::onFront() const
    {
-      Data dt;
-      pimpl->onFront((void *) &dt);
-      return dt;
+      unsigned char *bufer=new unsigned char[sizeof(Data)];
+      pimpl->onBack((void *) bufer);
+      return *((Data *)bufer);
    }
 
    template<typename Data>

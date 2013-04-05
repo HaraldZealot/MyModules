@@ -72,7 +72,7 @@ int main()
    return 0;
 }
 
-Proba::Proba():
+/*Proba::Proba():
    n(3),
    coord(0)
 {
@@ -81,7 +81,7 @@ Proba::Proba():
    coord[1] = 1.2;
    coord[2] = 1.3;
    cout << "empty constructor\n";
-}
+}*/
 
 Proba::Proba(int nn):
    n(nn),
