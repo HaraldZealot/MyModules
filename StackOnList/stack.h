@@ -1,10 +1,21 @@
 #ifndef STACK_H
 #define STACK_H
 
-#include "stackimplementation.h"
+#include <exception>
 
 namespace hzw
 {
+   class StackVoid;
+   class StackImplementation;
+
+   class StackException: public std::exception
+   {
+         const char *what() const throw()
+         {
+            return "hzw::read_from_empty_stack";
+         }
+   };
+
    template <typename Data>
    class Stack
    {
@@ -19,6 +30,22 @@ namespace hzw
          inline void pop();
          inline bool isEmpty() const;
       private:
+         StackVoid *pimpl;
+   };
+
+   class StackVoid
+   {
+      public:
+         StackVoid();
+         StackVoid(const StackVoid &original);
+         StackVoid &operator= (const StackVoid &roperand);
+         ~StackVoid();
+         void push(const void *dtAdress, int dtSize);
+         void pop();
+         void onTop(void *dtAdress) const;
+         bool isEmpty() const;
+         void clear();
+      private:
          StackImplementation *pimpl;
    };
 
@@ -26,14 +53,14 @@ namespace hzw
    Stack<Data>::Stack() :
       pimpl(0)
    {
-      pimpl = new StackImplementation;
+      pimpl = new StackVoid;
    }
 
    template<typename Data>
    Stack<Data>::Stack(const Stack<Data> &original) :
       pimpl(0)
    {
-      pimpl = new StackImplementation(*original.pimpl);
+      pimpl = new StackVoid(*original.pimpl);
    }
 
    template<typename Data>
@@ -81,7 +108,6 @@ namespace hzw
    {
       return pimpl->isEmpty();
    }
-
 }
 
 #endif // STACK_H
