@@ -2,6 +2,7 @@
 #define QUEUE_H
 
 #include <exception>
+#include <iostream>
 
 namespace hzw
 {
@@ -85,11 +86,9 @@ namespace hzw
    template<typename Data>
    Data Queue<Data>::onBack() const
    {
-      Data *dt=(Data *)(new unsigned char[sizeof(Data)]);
-      pimpl->onBack((void *) dt);
-      Data dt1(*dt);
-      delete [] (unsigned char)dt;
-      return dt1;
+      unsigned char *bufer=new unsigned char[sizeof(Data)];
+      pimpl->onBack((void *) bufer);
+      return *((Data *)bufer);
    }
 
    template<typename Data>
