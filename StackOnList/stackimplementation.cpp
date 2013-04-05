@@ -8,6 +8,60 @@ namespace hzw
 
    }
 
+   StackImplementation::StackImplementation(const StackImplementation &original) :
+      top(0)
+   {
+      Node *p=0, *q=original.top;
+      while(q)
+      {
+         Node *r=0;
+         r=new Node(q->datum,q->size);
+         r->link=p;
+         p=r;
+         q=q->link;
+      }
+      q=0;
+      while(p)
+      {
+         Node *r=p;
+         r=p->link;
+         p->link=q;
+         q=p;
+         p=r;
+         r=0;
+      }
+      top=q;
+      p=q=0;
+   }
+
+   StackImplementation &StackImplementation::operator= (const StackImplementation &roperand)
+   {
+      if(this==&roperand)return *this;
+      clear();
+      Node *p=0, *q=roperand.top;
+      while(q)
+      {
+         Node *r=0;
+         r=new Node(q->datum,q->size);
+         r->link=p;
+         p=r;
+         q=q->link;
+      }
+      q=0;
+      while(p)
+      {
+         Node *r=p;
+         r=p->link;
+         p->link=q;
+         q=p;
+         p=r;
+         r=0;
+      }
+      top=q;
+      p=q=0;
+      return *this;
+   }
+
    StackImplementation::~StackImplementation()
    {
       clear();

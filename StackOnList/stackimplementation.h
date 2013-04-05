@@ -16,6 +16,8 @@ namespace hzw
    {
       public:
          StackImplementation();
+         StackImplementation(const StackImplementation &original);
+         StackImplementation &operator= (const StackImplementation &roperand);
          ~StackImplementation();
          void push(const void *dtAdress, int dtSize);
          void pop();
