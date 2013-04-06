@@ -20,6 +20,8 @@ namespace hzw
    {
       public:
          inline Queue();
+         inline Queue(const Queue &original);
+         inline Queue &operator=(const Queue &roperand);
          inline ~Queue();
          inline void clear();
          inline void enqueue(Data dt);
@@ -35,6 +37,8 @@ namespace hzw
    {
       public:
          QueueVoid();
+         QueueVoid(const QueueVoid &original);
+         QueueVoid &operator=(const QueueVoid &roperand);
          ~QueueVoid();
          void clear();
          void enqueue(const void *dtAdress, int dtSize);
@@ -52,6 +56,19 @@ namespace hzw
       pimpl(0)
    {
       pimpl = new QueueVoid;
+   }
+
+   template<typename Data>
+   Queue<Data>::Queue(const Queue<Data> &original):
+      pimpl(0)
+   {
+      pimpl = new QueueVoid(*original.pimpl);
+   }
+
+   template<typename Data>
+   Queue<Data> &Queue<Data>::operator=(const Queue<Data> &roperand)
+   {
+      *pimpl = *roperand.pimpl;
    }
 
    template<typename Data>

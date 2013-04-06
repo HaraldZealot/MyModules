@@ -96,8 +96,6 @@ namespace hzw
          q = q->link;
       }
 
-      q = 0;
-
       while(p)
       {
          Node *r = p;
@@ -109,7 +107,7 @@ namespace hzw
       }
 
       top = q;
-      p = q = 0;
+      q = 0;
    }
 
    StackVoid::StackImplementation &StackVoid::StackImplementation::
@@ -129,8 +127,6 @@ namespace hzw
          q = q->link;
       }
 
-      q = 0;
-
       while(p)
       {
          Node *r = p;
@@ -142,7 +138,7 @@ namespace hzw
       }
 
       top = q;
-      p = q = 0;
+      q = 0;
       return *this;
    }
 

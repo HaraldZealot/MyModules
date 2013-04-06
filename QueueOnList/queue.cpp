@@ -6,6 +6,8 @@ namespace hzw
    {
       public:
          QueueImplementation();
+         QueueImplementation(const QueueImplementation &original);
+         QueueImplementation &operator=(const QueueImplementation &roperand);
          ~QueueImplementation();
          void clear();
          void enqueue(const void *dtAdress, int dtSize);
@@ -28,6 +30,17 @@ namespace hzw
       pimpl(0)
    {
       pimpl = new QueueImplementation;
+   }
+
+   QueueVoid::QueueVoid(const QueueVoid &original) :
+      pimpl(0)
+   {
+      pimpl = new QueueImplementation(*original.pimpl);
+   }
+
+   QueueVoid  &QueueVoid::operator= (const QueueVoid &roperand)
+   {
+      *pimpl = *roperand.pimpl;
    }
 
    QueueVoid::~QueueVoid()
@@ -69,10 +82,78 @@ namespace hzw
 
    QueueVoid::QueueImplementation::
    QueueImplementation() :
-      beg(0), end(0)
+      beg(0),
+      end(0)
    {
 
    }
+
+   QueueVoid::QueueImplementation::
+   QueueImplementation(const QueueVoid::QueueImplementation &original) :
+      beg(0),
+      end(0)
+   {
+      Node *p = 0, *q = original.beg;
+
+      while(q)
+      {
+         Node *r = 0;
+         r = new Node(q->datum, q->size);
+         r->link = p;
+         p = r;
+         q = q->link;
+      }
+
+      end = p;
+
+      while(p)
+      {
+         Node *r = p;
+         r = p->link;
+         p->link = q;
+         q = p;
+         p = r;
+         r = 0;
+      }
+
+      beg = q;
+      q = 0;
+   }
+
+   QueueVoid::QueueImplementation &QueueVoid::QueueImplementation::
+   operator= (const QueueVoid::QueueImplementation &roperand)
+   {
+      if(this == &roperand)return *this;
+
+      clear();
+      Node *p = 0, *q = roperand.beg;
+
+      while(q)
+      {
+         Node *r = 0;
+         r = new Node(q->datum, q->size);
+         r->link = p;
+         p = r;
+         q = q->link;
+      }
+
+      end = p;
+
+      while(p)
+      {
+         Node *r = p;
+         r = p->link;
+         p->link = q;
+         q = p;
+         p = r;
+         r = 0;
+      }
+
+      beg = q;
+      q = 0;
+      return *this;
+   }
+
 
    QueueVoid::QueueImplementation::
    ~QueueImplementation()
