@@ -5,9 +5,6 @@
 
 namespace hzw
 {
-   class StackVoid;
-   class StackImplementation;
-
    class StackException: public std::exception
    {
          const char *what() const throw()
@@ -15,6 +12,9 @@ namespace hzw
             return "hzw::read_from_empty_stack";
          }
    };
+
+   class StackVoid;
+
 
    template <typename Data>
    class Stack
@@ -46,6 +46,7 @@ namespace hzw
          bool isEmpty() const;
          void clear();
       private:
+         class StackImplementation;
          StackImplementation *pimpl;
    };
 
@@ -92,8 +93,8 @@ namespace hzw
    template<typename Data>
    Data Stack<Data>::onTop() const
    {
-      unsigned char *bufer=new unsigned char[sizeof(Data)];
-      pimpl->onBack((void *) bufer);
+      unsigned char *bufer = new unsigned char[sizeof(Data)];
+      pimpl->onTop((void *) bufer);
       return *((Data *)bufer);
    }
 

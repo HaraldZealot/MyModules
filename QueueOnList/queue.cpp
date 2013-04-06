@@ -2,7 +2,7 @@
 
 namespace hzw
 {
-   class QueueImplementation
+   class QueueVoid::QueueImplementation
    {
       public:
          QueueImplementation();
@@ -67,18 +67,21 @@ namespace hzw
       return pimpl->isEmpty();
    }
 
-   QueueImplementation::QueueImplementation() :
+   QueueVoid::QueueImplementation::
+   QueueImplementation() :
       beg(0), end(0)
    {
 
    }
 
-   QueueImplementation::~QueueImplementation()
+   QueueVoid::QueueImplementation::
+   ~QueueImplementation()
    {
       clear();
    }
 
-   void QueueImplementation::enqueue(const void *dtAdress, int dtSize)
+   void QueueVoid::QueueImplementation::
+   enqueue(const void *dtAdress, int dtSize)
    {
       Node *p = 0;
       p = new Node(dtAdress, dtSize);
@@ -92,7 +95,8 @@ namespace hzw
       p = 0;
    }
 
-   void QueueImplementation::dequeue()
+   void QueueVoid::QueueImplementation::
+   dequeue()
    {
       Node *p = beg;
 
@@ -108,7 +112,8 @@ namespace hzw
       }
    }
 
-   void QueueImplementation::onFront(void *dtAdress) const
+   void QueueVoid::QueueImplementation::
+   onFront(void *dtAdress) const
    {
       if(beg)
       {
@@ -118,7 +123,8 @@ namespace hzw
       else throw QueueException();
    }
 
-   void QueueImplementation::onBack(void *dtAdress) const
+   void QueueVoid::QueueImplementation::
+   onBack(void *dtAdress) const
    {
       if(end)
       {
@@ -128,12 +134,14 @@ namespace hzw
       else throw QueueException();
    }
 
-   bool QueueImplementation::isEmpty() const
+   bool QueueVoid::QueueImplementation::
+   isEmpty() const
    {
       return 0 == beg && 0 == end;
    }
 
-   void QueueImplementation::clear()
+   void QueueVoid::QueueImplementation::
+   clear()
    {
       while(beg)
       {
@@ -146,7 +154,8 @@ namespace hzw
       end = 0;
    }
 
-   QueueImplementation::Node::Node(const void *dtAdress, int dtSize) :
+   QueueVoid::QueueImplementation::Node::
+   Node(const void *dtAdress, int dtSize) :
       size(dtSize), datum(0), link(0)
    {
       if(dtAdress && dtSize)
@@ -158,7 +167,8 @@ namespace hzw
       }
    }
 
-   QueueImplementation::Node::~Node()
+   QueueVoid::QueueImplementation::Node::
+   ~Node()
    {
       if(datum && size)
       {

@@ -2,7 +2,7 @@
 
 namespace hzw
 {
-   class StackImplementation
+   class StackVoid::StackImplementation
    {
       public:
          StackImplementation();
@@ -74,72 +74,86 @@ namespace hzw
       return pimpl->isEmpty();
    }
 
-   StackImplementation::StackImplementation() :
+   StackVoid::StackImplementation::
+   StackImplementation() :
       top(0)
    {
 
    }
 
-   StackImplementation::StackImplementation(const StackImplementation &original) :
+   StackVoid::StackImplementation::
+   StackImplementation(const StackVoid::StackImplementation &original) :
       top(0)
    {
-      Node *p=0, *q=original.top;
+      Node *p = 0, *q = original.top;
+
       while(q)
       {
-         Node *r=0;
-         r=new Node(q->datum,q->size);
-         r->link=p;
-         p=r;
-         q=q->link;
+         Node *r = 0;
+         r = new Node(q->datum, q->size);
+         r->link = p;
+         p = r;
+         q = q->link;
       }
-      q=0;
+
+      q = 0;
+
       while(p)
       {
-         Node *r=p;
-         r=p->link;
-         p->link=q;
-         q=p;
-         p=r;
-         r=0;
+         Node *r = p;
+         r = p->link;
+         p->link = q;
+         q = p;
+         p = r;
+         r = 0;
       }
-      top=q;
-      p=q=0;
+
+      top = q;
+      p = q = 0;
    }
 
-   StackImplementation &StackImplementation::operator= (const StackImplementation &roperand)
+   StackVoid::StackImplementation &StackVoid::StackImplementation::
+   operator= (const StackVoid::StackImplementation &roperand)
    {
-      if(this==&roperand)return *this;
+      if(this == &roperand)return *this;
+
       clear();
-      Node *p=0, *q=roperand.top;
+      Node *p = 0, *q = roperand.top;
+
       while(q)
       {
-         Node *r=0;
-         r=new Node(q->datum,q->size);
-         r->link=p;
-         p=r;
-         q=q->link;
+         Node *r = 0;
+         r = new Node(q->datum, q->size);
+         r->link = p;
+         p = r;
+         q = q->link;
       }
-      q=0;
+
+      q = 0;
+
       while(p)
       {
-         Node *r=p;
-         r=p->link;
-         p->link=q;
-         q=p;
-         p=r;
-         r=0;
+         Node *r = p;
+         r = p->link;
+         p->link = q;
+         q = p;
+         p = r;
+         r = 0;
       }
-      top=q;
-      p=q=0;
+
+      top = q;
+      p = q = 0;
       return *this;
    }
 
-   StackImplementation::~StackImplementation()
+   StackVoid::StackImplementation::
+   ~StackImplementation()
    {
       clear();
    }
 
-   void StackImplementation::push(const void *dtAdress, int dtSize)
+   void StackVoid::StackImplementation::
+   push(const void *dtAdress, int dtSize)
    {
       Node *p = 0;
       p = new Node(dtAdress, dtSize);
@@ -148,7 +162,8 @@ namespace hzw
       p = 0;
    }
 
-   void StackImplementation::pop()
+   void StackVoid::StackImplementation::
+   pop()
    {
       Node *p = top;
 
@@ -160,7 +175,8 @@ namespace hzw
       }
    }
 
-   void StackImplementation::onTop(void *dtAdress) const
+   void StackVoid::StackImplementation::
+   onTop(void *dtAdress) const
    {
       if(top)
       {
@@ -170,12 +186,14 @@ namespace hzw
       else throw StackException();
    }
 
-   bool StackImplementation::isEmpty() const
+   bool StackVoid::StackImplementation::
+   isEmpty() const
    {
       return 0 == top;
    }
 
-   void StackImplementation::clear()
+   void StackVoid::StackImplementation::
+   clear()
    {
       while(top)
       {
@@ -186,7 +204,8 @@ namespace hzw
       }
    }
 
-   StackImplementation::Node::Node(const void *dtAdress, int dtSize) :
+   StackVoid::StackImplementation::Node::
+   Node(const void *dtAdress, int dtSize) :
       size(dtSize), datum(0), link(0)
    {
       if(dtAdress && dtSize)
@@ -198,7 +217,8 @@ namespace hzw
       }
    }
 
-   StackImplementation::Node::~Node()
+   StackVoid::StackImplementation::Node::
+   ~Node()
    {
       if(datum && size)
       {

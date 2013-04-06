@@ -5,9 +5,6 @@
 
 namespace hzw
 {
-   class QueueVoid;
-   class QueueImplementation;
-
    class QueueException: public std::exception
    {
          const char *what() const throw()
@@ -15,6 +12,8 @@ namespace hzw
             return "hzw::read_from_empty_queue";
          }
    };
+
+   class QueueVoid;
 
    template <typename Data>
    class Queue
@@ -44,6 +43,7 @@ namespace hzw
          void dequeue();
          bool isEmpty() const;
       private:
+         class QueueImplementation;
          QueueImplementation *pimpl;
    };
 
@@ -77,15 +77,15 @@ namespace hzw
    template<typename Data>
    Data Queue<Data>::onFront() const
    {
-      unsigned char *bufer=new unsigned char[sizeof(Data)];
-      pimpl->onBack((void *) bufer);
+      unsigned char *bufer = new unsigned char[sizeof(Data)];
+      pimpl->onFront((void *) bufer);
       return *((Data *)bufer);
    }
 
    template<typename Data>
    Data Queue<Data>::onBack() const
    {
-      unsigned char *bufer=new unsigned char[sizeof(Data)];
+      unsigned char *bufer = new unsigned char[sizeof(Data)];
       pimpl->onBack((void *) bufer);
       return *((Data *)bufer);
    }
