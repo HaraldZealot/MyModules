@@ -6,3 +6,6 @@
 /*/obj/
 /*/bin/
 *.save
+/lib/*
+/include/*
+
