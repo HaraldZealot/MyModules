@@ -68,6 +68,7 @@ namespace hzw
    Stack<Data>  &Stack<Data>::operator= (const Stack<Data> &roperand)
    {
       *pimpl = *roperand.pimpl;
+      return *this;
    }
 
    template<typename Data>

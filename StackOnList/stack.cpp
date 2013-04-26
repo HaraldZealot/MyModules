@@ -40,6 +40,7 @@ namespace hzw
    StackVoid  &StackVoid::operator= (const StackVoid &roperand)
    {
       *pimpl = *roperand.pimpl;
+      return *this;
    }
 
    StackVoid::~StackVoid()

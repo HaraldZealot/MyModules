@@ -41,6 +41,7 @@ namespace hzw
    QueueVoid  &QueueVoid::operator= (const QueueVoid &roperand)
    {
       *pimpl = *roperand.pimpl;
+      return *this;
    }
 
    QueueVoid::~QueueVoid()

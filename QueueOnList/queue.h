@@ -69,6 +69,7 @@ namespace hzw
    Queue<Data> &Queue<Data>::operator=(const Queue<Data> &roperand)
    {
       *pimpl = *roperand.pimpl;
+      return *this;
    }
 
    template<typename Data>
