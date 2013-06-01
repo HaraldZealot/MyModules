@@ -357,7 +357,7 @@ namespace hzw
          if(memcmp(head1->dataAdress_, head2->dataAdress_, head1->dataSize_) < 0)
             push(head, tail, pop(head1, tail1));
          else
-            push(head, tail, pop(head1, tail1));
+            push(head, tail, pop(head2, tail2));
       }
 
       if(head1)
