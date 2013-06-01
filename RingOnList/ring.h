@@ -53,7 +53,7 @@ namespace hzw
       ~RingVoid();
 
       void goForward(int turn);
-      void current(void *dataAdress, int dataSize);
+      void current(void *dataAdress, int dataSize) const;
       RingVoid operator+(const RingVoid &rightOperand) const;
       RingVoid operator-(const RingVoid &rightOperand) const;
       RingVoid operator*(const RingVoid &rightOperand) const;
@@ -65,6 +65,7 @@ namespace hzw
       bool contain(const void *sample,int samleSize) const;
 
       class RingImplementation;
+      RingVoid(const RingImplementation &original);
       RingImplementation *pimpl;
    };
 
