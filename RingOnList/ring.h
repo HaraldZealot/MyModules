@@ -36,7 +36,7 @@ namespace hzw
       inline Ring<Data> &operator*=(const Ring<Data> &rightOperand);
       inline bool isEmpty() const;
       inline bool hasSingle() const;
-      inline bool contain(Data sample);
+      inline bool contain(Data sample) const;
    private:
       RingVoid *pimpl;
       inline Ring(const RingVoid &original);
@@ -60,6 +60,9 @@ namespace hzw
       RingVoid &operator+=(const RingVoid &rightOperand);
       RingVoid &operator-=(const RingVoid &rightOperand);
       RingVoid &operator*=(const RingVoid &rightOperand);
+      bool isEmpty() const;
+      bool hasSingle() const;
+      bool contain(const void *sample,int samleSize) const;
 
       class RingImplementation;
       RingImplementation *pimpl;
@@ -70,6 +73,13 @@ namespace hzw
       pimpl(0)
    {
       pimpl = new RingVoid();
+   }
+
+   template <typename T>
+   Ring<T>::Ring(T e):
+      pimpl(0)
+   {
+      pimpl = new RingVoid((void *)&e,sizeof(T));
    }
 
    template <typename T>

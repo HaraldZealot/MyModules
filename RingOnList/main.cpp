@@ -5,6 +5,6 @@ using namespace std;
 
 int main()
 {
-    hzw::Ring<int> a;
-    return 0;
+   hzw::Ring<int> a(5);
+   return 0;
 }
