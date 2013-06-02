@@ -13,6 +13,8 @@ namespace hzw
       }
    };
 
+   typedef int (*FuncCompare)(const void *, const void *);
+
    class RingVoid;
 
    template <typename Data>
@@ -28,6 +30,7 @@ namespace hzw
 
       inline void goForward(int turn);
       inline Data current() const;
+      inline void excludeCurrent();
       inline Ring<Data> operator+(const Ring<Data> &rightOperand) const;
       inline Ring<Data> operator-(const Ring<Data> &rightOperand) const;
       inline Ring<Data> operator*(const Ring<Data> &rightOperand) const;
@@ -40,6 +43,7 @@ namespace hzw
    private:
       RingVoid *pimpl;
       inline Ring(const RingVoid &original);
+      int cmp(const void *a, const void *b);
    };
 
    class RingVoid
@@ -54,6 +58,7 @@ namespace hzw
 
       void goForward(int turn);
       void current(void *dataAdress, int dataSize) const;
+      void excludeCurrent();
       RingVoid operator+(const RingVoid &rightOperand) const;
       RingVoid operator-(const RingVoid &rightOperand) const;
       RingVoid operator*(const RingVoid &rightOperand) const;
@@ -67,6 +72,7 @@ namespace hzw
       class RingImplementation;
       RingVoid(const RingImplementation &original);
       RingImplementation *pimpl;
+      FuncCompare cmp_;
    };
 
    template <typename T>
@@ -74,6 +80,7 @@ namespace hzw
       pimpl(0)
    {
       pimpl = new RingVoid();
+      pimpl->cmp_ = (FuncCompare)&hzw::Ring<T>::cmp;
    }
 
    template <typename T>
@@ -81,12 +88,19 @@ namespace hzw
       pimpl(0)
    {
       pimpl = new RingVoid((void *)&e,sizeof(T));
+      pimpl->cmp_ = (FuncCompare)&hzw::Ring<T>::cmp;
    }
 
    template <typename T>
    Ring<T>::~Ring()
    {
       //dtor
+   }
+
+   template <typename T>
+   int Ring<T>::cmp(const void *a, const void *b)
+   {
+      return *((T *)a) == *((T *)b)?0:(*((T *)a) < *((T *)b)?-1:1);
    }
 
 }
