@@ -35,9 +35,13 @@ namespace hzw
          Node(const void *dataAdress, int dataSize);
          ~Node();
       } *current_;
+      void unionRing(const RingImplementation &a, const RingImplementation &b, Node *&resultH) const;
+      void intersectRing(const RingImplementation &a, const RingImplementation &b, Node *&resultH) const;
+      void substractRing(const RingImplementation &a, const RingImplementation &b, Node *&resultH) const;
       void clear();
       void copy(Node *&temp, const RingImplementation &original) const;
-      void sort();
+      void distinctify();
+      //void sort();
       void sort(Node *&head, Node *&tail) const;
       void split(Node *&head1, Node *&tail1, Node *&head2, Node *&tail2) const;
       void merge(Node *&head1, Node *&tail1, Node *&head2, Node *&tail2) const;
@@ -66,6 +70,82 @@ namespace hzw
       pimpl->setCmp(cmp_);
    }
 
+   RingVoid::RingVoid(const RingVoid &original)
+   {
+      //TODO
+   }
+
+   RingVoid &RingVoid::operator=(const RingVoid &rightOperand)
+   {
+      //TODO
+   }
+
+   RingVoid::~RingVoid()
+   {
+      //TODO
+   }
+
+   void RingVoid::goForward(int turn)
+   {
+      //TODO
+   }
+
+   void RingVoid::current(void *dataAdress, int dataSize) const
+   {
+      //TODO
+   }
+
+   void RingVoid::excludeCurrent()
+   {
+      //TODO
+   }
+
+   RingVoid RingVoid::operator+(const RingVoid &rightOperand) const
+   {
+      //TODO
+   }
+
+   RingVoid RingVoid::operator-(const RingVoid &rightOperand) const
+   {
+      //TODO
+   }
+
+   RingVoid RingVoid::operator*(const RingVoid &rightOperand) const
+   {
+      //TODO
+   }
+
+   RingVoid &RingVoid::operator+=(const RingVoid &rightOperand)
+   {
+      //TODO
+   }
+
+   RingVoid &RingVoid::operator-=(const RingVoid &rightOperand)
+   {
+      //TODO
+   }
+
+   RingVoid &RingVoid::operator*=(const RingVoid &rightOperand)
+   {
+      //TODO
+   }
+
+   bool RingVoid::isEmpty() const
+   {
+      //TODO
+   }
+
+   bool RingVoid::hasSingle() const
+   {
+      //TODO
+   }
+
+   bool RingVoid::contain(const void *sample, int samleSize) const
+   {
+      //TODO
+   }
+
+
 //======= RingImplementation ========
 
    RingVoid::RingImplementation::
@@ -78,10 +158,17 @@ namespace hzw
    RingImplementation(const void *dataAdress, int dataSize, int count):
       current_(0)
    {
-      register const void *p = dataAdress;
-
-      for(register int i = 0; i < count; ++i, p += dataSize)
+      for(register const void *p = 0, *end = dataAdress + count * dataSize;
+            p < end; p += dataSize)
          push(p, dataSize);
+
+      Node *head = current_,
+            *tail = 0;
+      breakRing(head, tail);
+      sort(head, tail);
+      closeRing(head, tail);
+      current_ = head;
+      distinctify();
    }
 
    //copy-swap pattern
@@ -118,7 +205,6 @@ namespace hzw
    ~RingImplementation()
    {
       clear();
-      current_ = 0;
    }
 
    void RingVoid::RingImplementation::
@@ -171,81 +257,73 @@ namespace hzw
    RingVoid::RingImplementation RingVoid::RingImplementation::
    operator+(const RingImplementation &rightOperand) const
    {
-      Node *leftH = 0,
-            *leftT = 0,
-             *rightH = 0,
-              *rightT = 0,
-               *resultH = 0,
-                *resultT = 0;
+      Node *preResult = 0;
 
-      copy(leftH, *this);
-      breakRing(leftH, leftT);
-      sort(leftH, leftT);
-
-      copy(rightH, rightOperand);
-      breakRing(rightH, rightT);
-      sort(rightH, rightT);
-
-      while(leftH && rightH)
-      {
-         Node *node = cmp_(leftH->dataAdress_, rightH->dataAdress_) < 0
-                      ? pop(leftH, leftT) : pop(rightH, rightT);
-
-         if(!resultH || cmp_(resultT->dataAdress_, node->dataAdress_) != 0)
-            push(resultH, resultT, node);
-      }
-
-      while(leftH)
-      {
-         Node *node = pop(leftH, leftT);
-
-         if(!resultH || cmp_(resultT->dataAdress_, node->dataAdress_) != 0)
-            push(resultH, resultT, node);
-      }
-
-      while(leftH)
-      {
-         Node *node = pop(rightH, rightT);
-
-         if(!resultH || cmp_(resultT->dataAdress_, node->dataAdress_) != 0)
-            push(resultH, resultT, node);
-      }
-
-      closeRing(resultH, resultT);
+      unionRing(*this, rightOperand, preResult);
       RingImplementation result;
-      result.current_ = resultH;
-      resultH = 0;
+      result.current_ = preResult;
+      preResult = 0;
       return result;
    }
 
    RingVoid::RingImplementation RingVoid::RingImplementation::
    operator-(const RingImplementation &rightOperand) const
    {
-      // TODO
+      Node *preResult = 0;
+
+      substractRing(*this, rightOperand, preResult);
+      RingImplementation result;
+      result.current_ = preResult;
+      preResult = 0;
+      return result;
    }
 
    RingVoid::RingImplementation RingVoid::RingImplementation::
    operator*(const RingImplementation &rightOperand) const
    {
-      // TODO
+      Node *preResult = 0;
+
+      intersectRing(*this, rightOperand, preResult);
+      RingImplementation result;
+      result.current_ = preResult;
+      preResult = 0;
+      return result;
    }
 
    RingVoid::RingImplementation &RingVoid::RingImplementation::
    operator+=(const RingImplementation &rightOperand)
    {
-      // TODO
+      Node *preResult = 0;
+
+      unionRing(*this, rightOperand, preResult);
+      this->clear();
+      this->current_ = preResult;
+      preResult = 0;
+      return *this;
    }
 
    RingVoid::RingImplementation &RingVoid::RingImplementation::
    operator-=(const RingImplementation &rightOperand)
    {
-      // TODO
+      Node *preResult = 0;
+
+      substractRing(*this, rightOperand, preResult);
+      this->clear();
+      this->current_ = preResult;
+      preResult = 0;
+      return *this;
    }
 
    RingVoid::RingImplementation &RingVoid::RingImplementation::
    operator*=(const RingImplementation &rightOperand)
    {
-      // TODO
+      Node *preResult = 0;
+
+      intersectRing(*this, rightOperand, preResult);
+      this->clear();
+      this->current_ = preResult;
+      preResult = 0;
+      return *this;
    }
 
    bool RingVoid::RingImplementation::
@@ -280,23 +358,159 @@ namespace hzw
    }
 
    void RingVoid::RingImplementation::
-   clear()
+   unionRing(const RingImplementation &a, const RingImplementation &b, Node *&head) const
    {
-      while(current_->next_ != current_)
+      Node *leftHead = 0,
+            *leftTail = 0,
+             *rightHead = 0,
+              *rightTail = 0,
+               *tail = 0;
+
+      copy(leftHead, a);
+      breakRing(leftHead, leftTail);
+      sort(leftHead, leftTail);
+
+      copy(rightHead, b);
+      breakRing(rightHead, rightTail);
+      sort(rightHead, rightTail);
+
+      while(leftHead && rightHead)
       {
-         Node *p = current_;
-         current_ = current_->next_;
-         delete p;
+         Node *node = cmp_(leftHead->dataAdress_, rightHead->dataAdress_) < 0
+                      ? pop(leftHead, leftTail) : pop(rightHead, rightTail);
+
+         if(!head || cmp_(tail->dataAdress_, node->dataAdress_) != 0)
+            push(head, tail, node);
+         else
+            delete node;
       }
 
-      delete current_;
-      current_ = 0;
+      while(leftHead)
+      {
+         Node *node = pop(leftHead, leftTail);
+
+         if(!head || cmp_(tail->dataAdress_, node->dataAdress_) != 0)
+            push(head, tail, node);
+         else
+            delete node;
+      }
+
+      while(rightHead)
+      {
+         Node *node = pop(rightHead, rightTail);
+
+         if(!head || cmp_(tail->dataAdress_, node->dataAdress_) != 0)
+            push(head, tail, node);
+         else
+            delete node;
+      }
+
+      closeRing(head, tail);
    }
 
    void RingVoid::RingImplementation::
-   copy(Node *&temp, const RingImplementation &original) const
+   intersectRing(const RingImplementation &a, const RingImplementation &b, Node *&head) const
    {
-      temp = 0;
+      Node *leftHead = 0,
+            *leftTail = 0,
+             *rightHead = 0,
+              *rightTail = 0,
+               *tail = 0;
+
+      copy(leftHead, a);
+      breakRing(leftHead, leftTail);
+      sort(leftHead, leftTail);
+
+      copy(rightHead, b);
+      breakRing(rightHead, rightTail);
+      sort(rightHead, rightTail);
+
+      while(leftHead && rightHead)
+      {
+         Node *node = 0;
+
+         if(cmp_(leftHead->dataAdress_, rightHead->dataAdress_) < 0)
+            delete pop(leftHead, leftTail);
+         else if(cmp_(leftHead->dataAdress_, rightHead->dataAdress_) > 0)
+            delete pop(rightHead, rightTail);
+         else
+         {
+            delete pop(leftHead, leftTail);
+            push(head, tail, pop(rightHead, rightTail));
+         }
+      }
+
+      while(leftHead)
+         delete pop(leftHead, leftTail);
+
+      while(rightHead)
+         delete pop(rightHead, rightTail);
+
+      closeRing(head, tail);
+   }
+
+   void RingVoid::RingImplementation::
+   substractRing(const RingImplementation &a, const RingImplementation &b, Node *&head) const
+   {
+      Node *leftHead = 0,
+            *leftTail = 0,
+             *rightHead = 0,
+              *rightTail = 0,
+               *tail = 0;
+
+      copy(leftHead, a);
+      breakRing(leftHead, leftTail);
+      sort(leftHead, leftTail);
+
+      copy(rightHead, b);
+      breakRing(rightHead, rightTail);
+      sort(rightHead, rightTail);
+
+      while(leftHead && rightHead)
+      {
+         Node *node = 0;
+
+         if(cmp_(leftHead->dataAdress_, rightHead->dataAdress_) < 0)
+            push(head, tail, pop(leftHead, leftTail));
+         else if(cmp_(leftHead->dataAdress_, rightHead->dataAdress_) > 0)
+            delete pop(rightHead, rightTail);
+         else
+         {
+            delete pop(leftHead, leftTail);
+            delete pop(rightHead, rightTail);
+         }
+      }
+
+      if(leftHead)
+         connect(head, tail, leftHead, leftTail);
+
+      while(rightHead)
+         delete pop(rightHead, rightTail);
+
+      closeRing(head, tail);
+   }
+
+   void RingVoid::RingImplementation::
+   clear()
+   {
+      if(current_)
+      {
+         while(current_->next_ != current_)
+         {
+            Node *p = current_;
+            current_ = current_->next_;
+            delete p;
+         }
+
+         delete current_;
+         current_ = 0;
+      }
+   }
+
+   void RingVoid::RingImplementation::
+   copy(Node *&copied, const RingImplementation &original) const
+   {
+      copied = 0;
 
       if(original.current_)
       {
@@ -307,18 +521,18 @@ namespace hzw
          {
             q = new Node(p->dataAdress_, p->dataSize_);
 
-            if(temp)
+            if(copied)
             {
-               q->next_ = temp;
+               q->next_ = copied;
                q->prev_ = current_->prev_;
-               temp->prev_->next_ = q;
-               temp->prev_ = q;
+               copied->prev_->next_ = q;
+               copied->prev_ = q;
             }
             else
             {
                q->next_ = q;
                p->prev_ = q;
-               temp = q;
+               copied = q;
             }
 
             q = 0;
@@ -327,6 +541,108 @@ namespace hzw
          }
          while(p != original.current_);
       }
+   }
+
+   void RingVoid::RingImplementation::
+   distinctify()
+   {
+      if(current_) {
+         Node *p = current_->next_;
+
+         while(p != current_ && p->next_ != p)
+         {
+            Node *q = p->next_;
+
+            if(cmp_(p->dataAdress_, p->prev_->dataAdress_) == 0)
+            {
+               p->next_->prev_ = p->prev_;
+               p->prev_->next_ = p->next_;
+               delete p;
+            }
+
+            p = q;
+         }
+      }
+   }
+
+   void RingVoid::RingImplementation::
+   sort(Node *&head, Node *&tail) const
+   {
+      if(head && tail) {
+         Node *leftHead = head,
+               *leftTail = head,
+                *rightHead = tail,
+                 *rightTail = tail;
+         split(leftHead, leftTail, rightHead, rightTail);
+
+         if(leftHead != leftTail)
+            sort(leftHead, leftTail);
+
+         if(rightHead != rightTail)
+            sort(rightHead, rightTail);
+
+         merge(leftHead, leftTail, rightHead, rightTail);
+         head = leftHead;
+         tail = leftTail;
+         leftHead = 0;
+         leftTail = 0;
+         rightHead = 0;
+         rightTail = 0;
+      }
+   }
+
+   void RingVoid::RingImplementation::
+   split(Node *&leftHead, Node *&leftTail, Node *&rightHead, Node *&rightTail) const
+   {
+      bool phase = false;
+
+      while(leftTail->next_ != rightHead)
+      {
+         if(phase)
+            leftTail = leftTail->next_;
+         else
+            rightHead = rightHead->prev_;
+
+         phase = !phase;
+      }
+
+      leftTail->next_ = 0;
+      rightHead->prev_ = 0;
+   }
+
+   void RingVoid::RingImplementation::
+   merge(Node *&leftHead, Node *&leftTail, Node *&rightHead, Node *&rightTail) const
+   {
+      Node *head = 0, *tail = 0;
+
+      while(leftHead && rightHead)
+      {
+         if(cmp_(leftHead->dataAdress_, rightHead->dataAdress_) < 0)
+            push(head, tail, pop(leftHead, leftTail));
+         else
+            push(head, tail, pop(rightHead, rightTail));
+      }
+
+      if(leftHead)
+         connect(head, tail, leftHead, leftTail);
+
+      if(rightHead)
+         connect(head, tail, rightHead, rightTail);
+
+      leftHead = head;
+      leftTail = tail;
+      head = 0;
+      tail = 0;
+   }
+
+   void RingVoid::RingImplementation::
+   connect(Node *&leftHead, Node *&leftTail, Node *&rightHead, Node *&rightTail) const
+   {
+      leftTail->next_ = rightHead;
+      rightHead->prev_ = leftTail;
+      leftTail = rightTail;
+      rightHead = 0;
+      rightTail = 0;
    }
 
    void RingVoid::RingImplementation::
@@ -350,99 +666,6 @@ namespace hzw
       }
 
       p = 0;
-   }
-
-   void RingVoid::RingImplementation::sort()
-   {
-      if(0 != current_ && current_ != current_->next_)
-      {
-         Node *head = current_, *tail = 0;
-         breakRing(head, tail);
-         sort(head, tail);
-         closeRing(head, tail);
-         current_ = head;
-         head = 0;
-      }
-   }
-
-   void RingVoid::RingImplementation::
-   sort(Node *&head, Node *&tail) const
-   {
-      if(head && tail) {
-         register Node *head1 = head,
-                        *tail1 = head,
-                         *head2 = tail,
-                          *tail2 = tail;
-         split(head1, tail1, head2, tail2);
-
-         if(head1 != tail1)
-            sort(head1, tail1);
-
-         if(head2 != tail2)
-            sort(head2, tail2);
-
-         merge(head1, tail1, head2, tail2);
-         head = head1;
-         tail = tail1;
-         head1 = 0;
-         tail1 = 0;
-         head2 = 0;
-         tail2 = 0;
-      }
-   }
-
-   void RingVoid::RingImplementation::
-   split(Node *&head1, Node *&tail1, Node *&head2, Node *&tail2) const
-   {
-      bool phase = false;
-
-      while(tail1->next_ != head2)
-      {
-         if(phase)
-            tail1 = tail1->next_;
-         else
-            head2 = head2->prev_;
-
-         phase = !phase;
-      }
-
-      tail1->next_ = 0;
-      head2->prev_ = 0;
-   }
-
-   void RingVoid::RingImplementation::
-   merge(Node *&head1, Node *&tail1, Node *&head2, Node *&tail2) const
-   {
-      register Node *head = 0, *tail = 0;
-
-      while(head1 && head2)
-      {
-         if(cmp_(head1->dataAdress_, head2->dataAdress_) < 0)
-            push(head, tail, pop(head1, tail1));
-         else
-            push(head, tail, pop(head2, tail2));
-      }
-
-      if(head1)
-         connect(head, tail, head1, tail1);
-
-      if(head2)
-         connect(head, tail, head2, tail2);
-
-      head1 = head;
-      tail1 = tail;
-      head = 0;
-      tail = 0;
-   }
-
-   void RingVoid::RingImplementation::
-   connect(Node *&head1, Node *&tail1, Node *&head2, Node *&tail2) const
-   {
-      tail1->next_ = head2;
-      head2->prev_ = tail1;
-      tail1 = tail2;
-      head2 = 0;
-      tail2 = 0;
    }
 
    void RingVoid::RingImplementation::
