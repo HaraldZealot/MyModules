@@ -3,9 +3,10 @@
 *.depend
 *.layout*
 *~
-/*/obj/
-/*/bin/
+obj/
+bin/
 *.save
 /lib/*
 /include/*
-
+doc/
+doxygen/

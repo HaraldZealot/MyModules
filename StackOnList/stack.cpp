@@ -1,27 +1,21 @@
-/**
- * Copyright (c) 2013 Alaksiej Piotr Stankievič (Alaksei Stankevich)
- * All rights reserved.
- * *************************
- * Author: Alaksiej Stankievič
- * *************************
- * module: StackOnList
- * project: MyModules
+/*!
+ * \file stack.h
+ * \brief implementation of classes StackVoid and StackImplementation
  *
- * implementation of classes StackVoid and StackImplementation
- * *************************
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * \author Alaksiej Stankievič aka Harald Zealot
+ * \copyright (c) 2013 Alaksiej Piotr Stankievič (Alaksei Stankevich).
+ * All rights reserved.
+ * \copyright Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Its copy is also available at the root directory of the project.
- *
- * Unless required by applicable law or agreed to in writing, software
+ * \copyright http://www.apache.org/licenses/LICENSE-2.0
+ * \copyright Its copy is also available at the root directory of the project.
+ * \copyright Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
 
 #include "stack.h"

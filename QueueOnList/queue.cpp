@@ -1,14 +1,15 @@
-/**
+/*!      \file
+
  * Copyright (c) 2013 Alaksiej Piotr Stankievič (Alaksei Stankevich)
  * All rights reserved.
- * *************************
+ ***************************
  * Author: Alaksiej Stankievič
- * *************************
+ ***************************
  * module: QueueOnList
  * project: MyModules
  *
  * implementation of classes QueueVoid and QueueImplementation
- * *************************
+ ***************************
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at

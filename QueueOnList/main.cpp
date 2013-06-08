@@ -1,4 +1,5 @@
-/**
+/*!      \file main.cpp
+
  * Copyright (c) 2013 Alaksiej Piotr Stankievič (Alaksei Stankevich)
  * All rights reserved.
  * *************************
