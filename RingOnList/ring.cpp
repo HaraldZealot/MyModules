@@ -16,12 +16,15 @@
  * limitations under the License.
  */
 
+
+
 #include <cstring>
 #include "ring.h"
 
 
 namespace hzw
 {
+   //! \privatesection
    class RingVoid::RingImplementation
    {
    public:

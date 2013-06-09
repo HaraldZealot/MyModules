@@ -18,9 +18,6 @@
  *
  * \defgroup RingOnList Ring on list
  * @{
- *
- *
- *
  */
 
 #ifndef RING_H
@@ -35,49 +32,137 @@
 */
 namespace hzw
 {
+   /*!
+    * \class RingException ring.h "hzw/ring.h"
+    * \brief Exception it will be thrown while trying to read from empty Ring.
+    */
    class RingException: public std::exception
    {
+      //! Exception's message.
       const char *what() const throw()
       {
          return "hzw::read_from_empty_ring";
       }
    };
 
+   /*!
+    * Pointer to function with typical for compare function signature
+    * \param [in] a The memory area contains object a.
+    * \param [in] b The memory area contains object b.
+    * \return Integer value, that corresponds to some comparability.
+    */
    typedef int (*FuncCompare)(const void *, const void *);
 
    class RingVoid;
 
-   /** template class Ring azaza
-   */
+   /*!
+    * \class Ring ring.h "hzw/ring.h"
+    * \brief Container class with current element and operations as on sets.
+    *
+    * Object which may contain uniform and comparable data-objects,
+    * that have copy constructor. The data-objects are arranged in close chain order.
+    * In every nonempty Ring exists the special selected element named current.
+    * The current selection can be moved up to any nonegative integer number. If
+    * the number is greater than count of elements, movement will be continued \a ab \a initio.
+    * It looks like the addition in modular ring in the mathematics very much.
+    * They may obtain and exclude current element. For two Ring\c s are also defined union,
+    * intersection and substraction with the same semantics as on mathematiacal sets.
+    *
+    * \par Purpose:
+    * The main purpose of the Ring is to generate nonrepeated random number
+    * from previosly determined set. Ring can be used also as usual set.
+    * \tparam Data is any data type with < and == comparsion operators.
+    */
    template <typename Data>
    class Ring
    {
    public:
+      //! Construct an empty Ring
       inline Ring();
+
+      //! \brief Construct a Ring with the single element
+      //!
+      //! \param [in] element
       explicit inline Ring(Data element);
+
+      //! \brief Construct a Ring by range of elements.
+      //!
+      //! The duplicates in the range will be eliminated if exist.
+      //! \param [in] elements of the range.
+      //! \param [in] count of elements in the range.
       inline Ring(const Data elements[], int count);
+
+      //! Copy constructor.
       inline Ring(const Ring &original);
+
+      //! Assign operator.
       inline Ring &operator=(const Ring &rightOperand);
+
+      //! Destructor.
       inline ~Ring();
 
+      //!  @{
+      //!  \brief Move up pointer to the current element.
+      //!
+      //!  \f$ pointer \equiv turn \bmod{count} \f$
+      //!  \param [in] turn is count of step
       inline void goForward(int turn);
+
+      //!  \brief Value of the current element.
+      //!
+      //!  \exception RingException is thrown while trying to read from empty Ring.
       inline Data current() const;
+
+      //!  Exclude the current element from the Ring
       inline void excludeCurrent();
+      //!  @}
+
+
+      //!@{
+      //! \brief Union operator.
+      //!
+      //! \f$ result = left \cup right \f$
       inline Ring<Data> operator+(const Ring<Data> &rightOperand) const;
+
+      //! \brief Substract operator.
+      //!
+      //! \f$ result = left \setminus right \f$
       inline Ring<Data> operator-(const Ring<Data> &rightOperand) const;
+
+      //! \brief Intersect operator.
+      //!
+      //! \f$ result = left \cap right \f$
       inline Ring<Data> operator*(const Ring<Data> &rightOperand) const;
+
+      //! Union assign operatot. \see operator+()
       inline Ring<Data> &operator+=(const Ring<Data> &rightOperand);
+
+      //! Substract assign operatot. \see operator-()
       inline Ring<Data> &operator-=(const Ring<Data> &rightOperand);
+
+      //! Intersect assign operatot. \see operator*()
       inline Ring<Data> &operator*=(const Ring<Data> &rightOperand);
+      //!@}
+
+      //!@{
+      //! Predicate that is true when the Ring is an empty.
       inline bool isEmpty() const;
+
+      //! Predicate that is true when the Ring has the one element only.
       inline bool hasSingle() const;
+
+      //! Predicate that is true when the Ring contain the sample element.
+      //!
+      //! \param [in] sample element presence of which will be examinated.
       inline bool contain(Data sample) const;
+      //!@}
    private:
       static int cmp(const void *a, const void *b);
       RingVoid *pimpl_;
       inline Ring(const RingVoid &original);
    };
 
+   //! \privatesection
    class RingVoid
    {
    private:
