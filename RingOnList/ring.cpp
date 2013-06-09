@@ -25,6 +25,10 @@
 namespace hzw
 {
    //! \privatesection
+
+   // The crack-safe methodology is present in this module:
+   // no traces of data stay in memory aposteriory.
+
    class RingVoid::RingImplementation
    {
    public:
@@ -43,8 +47,8 @@ namespace hzw
       RingImplementation &operator+=(const RingImplementation &rightOperand);
       RingImplementation &operator-=(const RingImplementation &rightOperand);
       RingImplementation &operator*=(const RingImplementation &rightOperand);
-      bool isEmpty() const;
-      bool hasSingle() const;
+      inline bool isEmpty() const;
+      inline bool hasSingle() const;
       bool contain(const void *sampleAdress, int sampleSize) const;
       FuncCompare getCmp() const {return cmp_;}
    private:
@@ -56,22 +60,36 @@ namespace hzw
          Node(const void *dataAdress, int dataSize);
          ~Node();
       } *current_;
+      FuncCompare cmp_;
+
+      // This functions are used by corresponding operator.
+      // They all have an idea similar to merge() function and have O(n log n) assymptotic.
       void unionRing(const RingImplementation &a, const RingImplementation &b, Node *&resultH) const;
       void intersectRing(const RingImplementation &a, const RingImplementation &b, Node *&resultH) const;
       void substractRing(const RingImplementation &a, const RingImplementation &b, Node *&resultH) const;
+
+      // There are service functions for constructors and company.
       void clear();
       void copy(Node *&temp, const RingImplementation &original) const;
       void distinctify();
+
+      // There is sort() function for sequence of Node and its servuce function.
+      // Sort() uses merge sort algorithm with known O(n log n) assymptotic.
       void sort(Node *&head, Node *&tail) const;
       void split(Node *&head1, Node *&tail1, Node *&head2, Node *&tail2) const;
       void merge(Node *&head1, Node *&tail1, Node *&head2, Node *&tail2) const;
       void connect(Node *&head1, Node *&tail1, Node *&head2, Node *&tail2) const;
+
+      // There are methods for add and exctract single element
       void push(const void *dataAdress, int dataSize);
+      // N.B! This static methods work with whole Node for optimisation because
+      // they are strict internal.
       static void push(Node *&head, Node *&tail, Node *node);
       static Node *pop(Node *&head, Node *&tail);
+
+      // There are conversion functions between Ring an sequence.
       inline void breakRing(Node *&head, Node *&tail) const;
       inline void closeRing(Node *&head, Node *&tail) const;
-      FuncCompare cmp_;
    };
 
 //============ RingVoid =============
@@ -205,9 +223,9 @@ namespace hzw
 
       if(count > 1) {
          Node *head = current_,
-               *tail = 0;
-         breakRing(head, tail);
-         sort(head, tail);
+              *tail = 0;
+         breakRing(head, tail);// sort() works with sequence only
+         sort(head, tail); // distinctify() needs sorted Ring for properly work
          closeRing(head, tail);
          current_ = head;
          distinctify();
@@ -377,7 +395,8 @@ namespace hzw
       return 0 == current_;
    }
 
-   bool RingVoid::RingImplementation::hasSingle() const
+   bool RingVoid::RingImplementation::
+   hasSingle() const
    {
       return 0 != current_ && current_ == current_->next_;
    }
@@ -403,20 +422,24 @@ namespace hzw
       return find;
    }
 
+   // The algorithm is modification of merge(), the nodes are added to resulting
+   // sequence if and only if they aren't present there.
    void RingVoid::RingImplementation::
    unionRing(const RingImplementation &a, const RingImplementation &b, Node *&head) const
    {
       if(a.isEmpty() || b.isEmpty())
       {
+         // There is trivial cases optimization
          copy(head, (a.isEmpty() ? b : a));
       }
       else
       {
+         // ---- sequences preparation
          Node *leftHead = 0,
-               *leftTail = 0,
-                *rightHead = 0,
-                 *rightTail = 0,
-                  *tail = 0;
+              *leftTail = 0,
+              *rightHead = 0,
+              *rightTail = 0,
+              *tail = 0;
 
          copy(leftHead, a);
          breakRing(leftHead, leftTail);
@@ -426,6 +449,7 @@ namespace hzw
          breakRing(rightHead, rightTail);
          sort(rightHead, rightTail);
 
+         // ---- special merging
          while(leftHead && rightHead)
          {
             Node *node = cmp_(leftHead->dataAdress_, rightHead->dataAdress_) < 0
@@ -437,6 +461,7 @@ namespace hzw
                delete node;
          }
 
+         // ---- treatment of sequences reminders
          while(leftHead)
          {
             Node *node = pop(leftHead, leftTail);
@@ -461,20 +486,24 @@ namespace hzw
       }
    }
 
+   // The algorithm is modification of merge(), the nodes are added to resulting
+   // sequence if and only if they are present in both left and right sequences.
    void RingVoid::RingImplementation::
    intersectRing(const RingImplementation &a, const RingImplementation &b, Node *&head) const
    {
       if(a.isEmpty() || b.isEmpty())
       {
+         // There is trivial cases optimization
          head = 0;
       }
       else
       {
+         // ---- sequences preparation
          Node *leftHead = 0,
-               *leftTail = 0,
-                *rightHead = 0,
-                 *rightTail = 0,
-                  *tail = 0;
+              *leftTail = 0,
+              *rightHead = 0,
+              *rightTail = 0,
+              *tail = 0;
 
          copy(leftHead, a);
          breakRing(leftHead, leftTail);
@@ -484,6 +513,7 @@ namespace hzw
          breakRing(rightHead, rightTail);
          sort(rightHead, rightTail);
 
+         // ---- special merging
          while(leftHead && rightHead)
          {
             Node *node = 0;
@@ -499,6 +529,7 @@ namespace hzw
             }
          }
 
+         // ---- treatment of sequences reminders
          while(leftHead)
             delete pop(leftHead, leftTail);
 
@@ -509,20 +540,24 @@ namespace hzw
       }
    }
 
+   // The algorithm is modification of merge(), the nodes  of left sequence
+   // are added to resulting sequence if and only if they aren't present in right sequence.
    void RingVoid::RingImplementation::
    substractRing(const RingImplementation &a, const RingImplementation &b, Node *&head) const
    {
       if(b.isEmpty())
       {
+         // There is trivial cases optimization
          copy(head, a);
       }
       else
       {
+         // ---- sequences preparation
          Node *leftHead = 0,
-               *leftTail = 0,
-                *rightHead = 0,
-                 *rightTail = 0,
-                  *tail = 0;
+              *leftTail = 0,
+              *rightHead = 0,
+              *rightTail = 0,
+              *tail = 0;
 
          copy(leftHead, a);
          breakRing(leftHead, leftTail);
@@ -532,6 +567,7 @@ namespace hzw
          breakRing(rightHead, rightTail);
          sort(rightHead, rightTail);
 
+         // ---- special merging
          while(leftHead && rightHead)
          {
             Node *node = 0;
@@ -547,6 +583,7 @@ namespace hzw
             }
          }
 
+         // ---- treatment of sequences reminders
          if(leftHead)
             connect(head, tail, leftHead, leftTail);
 
@@ -566,7 +603,7 @@ namespace hzw
                *tail = 0;
          current_ = 0;
 
-         breakRing(head, tail);
+         breakRing(head, tail);// deleting corresponding sequence are much easier
 
          while(head)
          {
@@ -580,6 +617,7 @@ namespace hzw
       }
    }
 
+   // create a copy Ring, pointer copied points to result
    void RingVoid::RingImplementation::
    copy(Node *&copied, const RingImplementation &original) const
    {
@@ -638,14 +676,16 @@ namespace hzw
       }
    }
 
+   // merge sort algorithm
    void RingVoid::RingImplementation::
    sort(Node *&head, Node *&tail) const
    {
       if(head && tail && head != tail) {
          Node *leftHead = head,
-               *leftTail = head,
-                *rightHead = tail,
-                 *rightTail = tail;
+              *leftTail = head,
+              *rightHead = tail,
+              *rightTail = tail;
+
          split(leftHead, leftTail, rightHead, rightTail);
 
          if(leftHead != leftTail)
@@ -664,11 +704,14 @@ namespace hzw
       }
    }
 
+   // Two pointers are moved towards each other in turn from the ends
+   // while they meet almost in the midle of the sequence.
+   // The sequence is splited between this pointers.
    void RingVoid::RingImplementation::
    split(Node *&leftHead, Node *&leftTail, Node *&rightHead, Node *&rightTail) const
    {
       if(leftHead != rightTail) {
-         bool phase = false;
+         bool phase = false;// determine left or right pointer turn
 
          while(leftTail->next_ != rightHead)
          {
@@ -690,6 +733,7 @@ namespace hzw
    {
       Node *head = 0, *tail = 0;
 
+      // ---- usual merging
       while(leftHead && rightHead)
       {
          if(cmp_(leftHead->dataAdress_, rightHead->dataAdress_) < 0)
@@ -698,6 +742,7 @@ namespace hzw
             push(head, tail, pop(rightHead, rightTail));
       }
 
+      // ---- treatment of sequences reminders
       if(leftHead)
          connect(head, tail, leftHead, leftTail);
 

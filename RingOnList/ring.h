@@ -34,11 +34,11 @@ namespace hzw
 {
    /*!
     * \class RingException ring.h "hzw/ring.h"
-    * \brief Exception it will be thrown while trying to read from empty Ring.
+    * \brief Exception that will be thrown while trying to read from empty Ring.
     */
    class RingException: public std::exception
    {
-      //! Exception's message.
+      //! \brief Exception's message.
       const char *what() const throw()
       {
          return "hzw::read_from_empty_ring";
@@ -83,7 +83,7 @@ namespace hzw
       //! \brief Construct a Ring with the single element
       //!
       //! \param [in] element
-      explicit inline Ring(Data element);
+      explicit inline Ring(const Data &element);
 
       //! \brief Construct a Ring by range of elements.
       //!
@@ -145,24 +145,44 @@ namespace hzw
       //!@}
 
       //!@{
-      //! Predicate that is true when the Ring is an empty.
+      //! \brief Predicate that is true when the Ring is an empty.
       inline bool isEmpty() const;
 
       //! Predicate that is true when the Ring has the one element only.
       inline bool hasSingle() const;
 
-      //! Predicate that is true when the Ring contain the sample element.
+      //! \brief Predicate that is true when the Ring contain the sample element.
       //!
       //! \param [in] sample element presence of which will be examinated.
       inline bool contain(Data sample) const;
       //!@}
    private:
+      //! \brief Compare function for two Data objects when they will be present as raw memory.
+      //!
+      //! N.B! This function can't be inline i.e. they need pointer to this function.
+      //! \return -1 when a<b, 0 when a==b and 1 when a>b/
       static int cmp(const void *a, const void *b);
+
+      // Pointer to implementation aka Cheshire Cat patern
       RingVoid *pimpl_;
+      // Service construcror
       inline Ring(const RingVoid &original);
    };
 
    //! \privatesection
+
+   // RingVoid is intermediate class in Ring architecture. It implementates
+   // Ring, but is placed in ring.h i.e. will be instantiated in Ring templates method.
+   // At the same time RingVoid is wrapper just for the real wheelhorse RingImplementation.
+   // It can't be a part of Ring i.e. just move visabilaty problem of templates to
+   // the next level, but grant user access to this class is also undesirable.
+   // Therefore all RingVoid methods are private and Ring obtain access to RingVoid
+   // by friendship.
+   //
+   // RingVoid and RingImplementation work with raw memory and obtain type-specific
+   // behavior through pointer to compare function. The Ring template class wraps
+   // this machine-friendly methodology in user-friendly interface (which may be inlined).
+   // All these means lead to sufficient decrease of code bloating.
    class RingVoid
    {
    private:
@@ -199,8 +219,9 @@ namespace hzw
       pimpl_ = new RingVoid((FuncCompare)&hzw::Ring<T>::cmp);
    }
 
+
    template <typename T>
-   Ring<T>::Ring(T element):
+   Ring<T>::Ring(const T &element):
       pimpl_(0)
    {
       pimpl_ = new RingVoid((FuncCompare)hzw::Ring<T>::cmp, (void *)&element, sizeof(T));
@@ -253,7 +274,7 @@ namespace hzw
    {
       unsigned char *bufer = new unsigned char[sizeof(T)];
       pimpl_->current((void *) bufer, sizeof(T));
-      return *((T *)bufer);
+      return *((T *)bufer);// N.B! The copy constructor of Data will be called.
    }
 
    template <typename T>
