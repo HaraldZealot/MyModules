@@ -52,15 +52,17 @@ namespace hzw
       bool contain(const void *sampleAdress, int sampleSize) const;
       FuncCompare getCmp() const {return cmp_;}
    private:
+      FuncCompare cmp_;
       struct Node
       {
          void *dataAdress_;
          int dataSize_;
+         FuncCompare ttt_;
          Node *next_, *prev_;
          Node(const void *dataAdress, int dataSize);
          ~Node();
       } *current_;
-      FuncCompare cmp_;
+
 
       // This functions are used by corresponding operator.
       // They all have an idea similar to merge() function and have O(n log n) assymptotic.

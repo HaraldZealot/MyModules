@@ -24,18 +24,29 @@
 using namespace std;
 using namespace hzw;
 
+class Int
+{
+   int data_;
+public:
+   Int(int value):data_(value){};
+   bool operator!=(const Int &b){return data_!=b.data_;}
+   bool operator==(const Int &b){return data_==b.data_;}
+   bool operator<(const Int &b){return data_<b.data_;}
+   friend ostream &operator<<(ostream &out, const Int &b){out<<b.data_;return out;}
+};
+
 template<typename T>
 ostream &operator<<(ostream &out, Ring<T> &ring);
 
 int main()
 {
    try {
-      Ring<int> a(5);
+      Ring<Int> a(5);
       cout << "ring a: " << a << endl;
-      int elements1[4] = {5, 5 , 1, 2};
-      Ring<int> b(elements1, 4);
+      Int elements1[4] = {5, 5 , 1, 2};
+      Ring<Int> b(elements1, 4);
       cout << "ring b: " << b << endl;
-      Ring<int> c;
+      Ring<Int> c;
       cout << "ring c: " << c << endl;
       c = a + b;
       cout << "ring a + b: " << c << endl;
@@ -45,16 +56,16 @@ int main()
       cout << "ring b - a: " << c << endl;
       c = a * b;
       cout << "ring a * b: " << c << endl;
-      a += Ring<int>(7);
+      a += Ring<Int>(7);
       cout << "ring a: " << a << endl;
-      int elements2[6] = {7, 4, 10, 7, 4, 8};
-      a += Ring<int>(elements2, 6);
+      Int elements2[6] = {7, 4, 10, 7, 4, 8};
+      a += Ring<Int>(elements2, 6);
       cout << "ring a: " << a << endl;
-      a += Ring<int>();
+      a += Ring<Int>();
       cout << "ring a: " << a << endl;
-      a -= Ring<int>();
+      a -= Ring<Int>();
       cout << "ring a: " << a << endl;
-      a *= Ring<int>();
+      a *= Ring<Int>();
       cout << "ring a: " << a << endl;
       a += a;
       cout << "ring a: " << a << endl;
@@ -70,10 +81,10 @@ int main()
       cout << "ring a: " << a << endl;
 
       cout << endl;
-      a -= Ring<int>(1);
-      a += Ring<int>(7);
+      a -= Ring<Int>(1);
+      a += Ring<Int>(7);
       cout << "ring a: " << a << endl;
-      b += Ring<int>(-1);
+      b += Ring<Int>(-1);
       cout << "ring b: " << b << endl;
       c = a + b;
       cout << "ring a + b: " << c << endl;
@@ -85,7 +96,7 @@ int main()
       cout << "ring a * b: " << c << endl;
 
       cout << "\n\n=======================\n\n";
-      a += b + Ring<int>(elements2, 6);
+      a += b + Ring<Int>(elements2, 6);
 
       while(!a.isEmpty()) {
          cout << "ring a: " << a << endl;
@@ -117,8 +128,8 @@ ostream &operator<<(ostream &out, Ring<T> &ring)
       out << "\342\210\205"; // UTF-8 for empty set sign. In non unicode console try: out<<"%";
    else
    {
-      T temp;
-      out << '{' << (temp = ring.current());
+      T temp(ring.current());
+      out << '{' << (temp );
       ring.goForward(1);
 
       for(; temp != ring.current(); ring.goForward(1))

@@ -167,6 +167,11 @@ namespace hzw
       RingVoid *pimpl_;
       // Service construcror
       inline Ring(const RingVoid &original);
+      void dataConstructor(void *p2O, const void *original)
+      {
+         Data *temp=new Data(*(Data *)original);
+         //((Data *)p2O)->Data(*(Data *)original);
+      }
    };
 
    //! \privatesection
@@ -224,6 +229,8 @@ namespace hzw
    Ring<T>::Ring(const T &element):
       pimpl_(0)
    {
+      unsigned char *bufer = new unsigned char[sizeof(T)];
+      dataConstructor((void *)bufer,(const void *)&element);
       pimpl_ = new RingVoid((FuncCompare)hzw::Ring<T>::cmp, (void *)&element, sizeof(T));
    }
 
