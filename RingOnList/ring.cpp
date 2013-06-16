@@ -32,8 +32,9 @@ namespace hzw
    class RingVoid::RingImplementation
    {
    public:
-      RingImplementation(FuncCompare cmp);
-      RingImplementation(FuncCompare cmp, const void *dataAdress, int dataSize, int count);
+      RingImplementation(FuncCompare cmp, FuncConstructor ctor, FuncDestructor dtor);
+      RingImplementation(FuncCompare cmp, FuncConstructor ctor, FuncDestructor dtor,
+                         const void *dataAdress, int dataSize, int count);
       RingImplementation(const RingImplementation &original);
       RingImplementation &operator=(const RingImplementation &rightOperand);
       ~RingImplementation();
@@ -50,16 +51,18 @@ namespace hzw
       inline bool isEmpty() const;
       inline bool hasSingle() const;
       bool contain(const void *sampleAdress, int sampleSize) const;
-      FuncCompare getCmp() const {return cmp_;}
    private:
       FuncCompare cmp_;
+      FuncConstructor constructor_;
+      FuncDestructor destructor_;
       struct Node
       {
          void *dataAdress_;
          int dataSize_;
-         FuncCompare ttt_;
          Node *next_, *prev_;
-         Node(const void *dataAdress, int dataSize);
+         FuncConstructor constructor_;
+         FuncDestructor destructor_;
+         Node(FuncConstructor ctor, FuncDestructor dtor, const void *dataAdress, int dataSize);
          ~Node();
       } *current_;
 
@@ -96,37 +99,32 @@ namespace hzw
 
 //============ RingVoid =============
 
-   RingVoid::RingVoid(FuncCompare cmp):
-      pimpl_(0),
-      cmp_(cmp)
+   RingVoid::RingVoid(FuncCompare cmp, FuncConstructor ctor, FuncDestructor dtor):
+      pimpl_(0)
    {
-      pimpl_ = new RingImplementation(cmp_);
+      pimpl_ = new RingImplementation(cmp, ctor, dtor);
    }
 
-   RingVoid::RingVoid(FuncCompare cmp, const void *dataAdress, int dataSize, int count):
-      pimpl_(0),
-      cmp_(cmp)
+   RingVoid::RingVoid(FuncCompare cmp, FuncConstructor ctor, FuncDestructor dtor,  const void *dataAdress, int dataSize, int count):
+      pimpl_(0)
    {
-      pimpl_ = new RingImplementation(cmp_, dataAdress, dataSize, count);
+      pimpl_ = new RingImplementation(cmp, ctor, dtor, dataAdress, dataSize, count);
    }
 
    RingVoid::RingVoid(const RingVoid &original):
-      pimpl_(0),
-      cmp_(original.cmp_)
+      pimpl_(0)
    {
       pimpl_ = new RingImplementation(*original.pimpl_);
    }
 
    RingVoid::RingVoid(const RingImplementation &original):
-      pimpl_(0),
-      cmp_(original.getCmp())
+      pimpl_(0)
    {
       pimpl_ = new RingImplementation(original);
    }
 
    RingVoid &RingVoid::operator=(const RingVoid &rightOperand)
    {
-      cmp_ = rightOperand.cmp_;
       *pimpl_ = *rightOperand.pimpl_;
       return *this;
    }
@@ -135,7 +133,6 @@ namespace hzw
    {
       delete pimpl_;
       pimpl_ = 0;
-      cmp_ = 0;
    }
 
    void RingVoid::goForward(int turn)
@@ -170,21 +167,18 @@ namespace hzw
 
    RingVoid &RingVoid::operator+=(const RingVoid &rightOperand)
    {
-      cmp_ = rightOperand.cmp_;
       *pimpl_ += *rightOperand.pimpl_;
       return *this;
    }
 
    RingVoid &RingVoid::operator-=(const RingVoid &rightOperand)
    {
-      cmp_ = rightOperand.cmp_;
       *pimpl_ -= *rightOperand.pimpl_;
       return *this;
    }
 
    RingVoid &RingVoid::operator*=(const RingVoid &rightOperand)
    {
-      cmp_ = rightOperand.cmp_;
       *pimpl_ *= *rightOperand.pimpl_;
       return *this;
    }
@@ -208,16 +202,21 @@ namespace hzw
 //======= RingImplementation ========
 
    RingVoid::RingImplementation::
-   RingImplementation(FuncCompare cmp):
+   RingImplementation(FuncCompare cmp, FuncConstructor ctor, FuncDestructor dtor):
       current_(0),
-      cmp_(cmp)
+      cmp_(cmp),
+      constructor_(ctor),
+      destructor_(dtor)
    {
    }
 
    RingVoid::RingImplementation::
-   RingImplementation(FuncCompare cmp, const void *dataAdress, int dataSize, int count):
+   RingImplementation(FuncCompare cmp, FuncConstructor ctor, FuncDestructor dtor,
+                      const void *dataAdress, int dataSize, int count):
       current_(0),
-      cmp_(cmp)
+      cmp_(cmp),
+      constructor_(ctor),
+      destructor_(dtor)
    {
       for(register const void *p = dataAdress, *end = dataAdress + count * dataSize;
             p < end; p += dataSize)
@@ -238,7 +237,9 @@ namespace hzw
    RingVoid::RingImplementation::
    RingImplementation(const RingImplementation &original):
       current_(0),
-      cmp_(original.cmp_)
+      cmp_(original.cmp_),
+      constructor_(original.constructor_),
+      destructor_(original.destructor_)
    {
       Node *temp = 0;
       copy(temp, original);
@@ -256,6 +257,8 @@ namespace hzw
          copy(temp, rightOperand);
          clear();
          cmp_ = rightOperand.cmp_;
+         constructor_ = rightOperand.constructor_;
+         destructor_ = rightOperand.destructor_;
          current_ = temp;
       }
 
@@ -322,7 +325,7 @@ namespace hzw
       Node *preResult = 0;
 
       unionRing(*this, rightOperand, preResult);
-      RingImplementation result(cmp_);
+      RingImplementation result(cmp_, constructor_, destructor_);
       result.current_ = preResult;
       preResult = 0;
       return result;
@@ -334,7 +337,7 @@ namespace hzw
       Node *preResult = 0;
 
       substractRing(*this, rightOperand, preResult);
-      RingImplementation result(cmp_);
+      RingImplementation result(cmp_, constructor_, destructor_);
       result.current_ = preResult;
       preResult = 0;
       return result;
@@ -346,7 +349,7 @@ namespace hzw
       Node *preResult = 0;
 
       intersectRing(*this, rightOperand, preResult);
-      RingImplementation result(cmp_);
+      RingImplementation result(cmp_, constructor_, destructor_);
       result.current_ = preResult;
       preResult = 0;
       return result;
@@ -360,6 +363,8 @@ namespace hzw
       unionRing(*this, rightOperand, preResult);
       this->clear();
       this->cmp_ = rightOperand.cmp_;
+      this->constructor_ = rightOperand.constructor_;
+      this->destructor_ = rightOperand.destructor_;
       this->current_ = preResult;
       preResult = 0;
       return *this;
@@ -373,6 +378,8 @@ namespace hzw
       substractRing(*this, rightOperand, preResult);
       this->clear();
       this->cmp_ = rightOperand.cmp_;
+      this->constructor_ = rightOperand.constructor_;
+      this->destructor_ = rightOperand.destructor_;
       this->current_ = preResult;
       preResult = 0;
       return *this;
@@ -386,6 +393,8 @@ namespace hzw
       intersectRing(*this, rightOperand, preResult);
       this->clear();
       this->cmp_ = rightOperand.cmp_;
+      this->constructor_ = rightOperand.constructor_;
+      this->destructor_ = rightOperand.destructor_;
       this->current_ = preResult;
       preResult = 0;
       return *this;
@@ -632,7 +641,7 @@ namespace hzw
 
          do
          {
-            q = new Node(p->dataAdress_, p->dataSize_);
+            q = new Node(constructor_, destructor_, p->dataAdress_, p->dataSize_);
 
             if(copied)
             {
@@ -779,7 +788,7 @@ namespace hzw
    push(const void *dataAdress, int dataSize)
    {
       Node *p = 0;
-      p = new Node(dataAdress, dataSize);
+      p = new Node(constructor_, destructor_, dataAdress, dataSize);
 
       if(current_)
       {
@@ -863,15 +872,18 @@ namespace hzw
 //============== Node ===============
 
    // copy-swap pattern
-   RingVoid::RingImplementation::Node::Node(const void *dataAdress, int dataSize):
+   RingVoid::RingImplementation::Node::Node(FuncConstructor ctor, FuncDestructor dtor,
+                                            const void *dataAdress, int dataSize):
       dataAdress_(0),
       dataSize_(0),
       next_(0),
-      prev_(0)
+      prev_(0),
+      constructor_(ctor),
+      destructor_(dtor)
    {
       void *temp = 0;
       temp = (void *)new unsigned char[dataSize];
-      memcpy(temp, dataAdress, dataSize);
+      temp = constructor_(temp, dataAdress);
       dataSize_ = dataSize;
       dataAdress_ = temp;
       temp = 0;
@@ -882,6 +894,7 @@ namespace hzw
    {
       prev_ = 0;
       next_ = 0;
+      destructor_(dataAdress_);
       memset(dataAdress_, 0, dataSize_); //it is being filled zeros
       delete [] dataAdress_;
       dataAdress_ = 0;

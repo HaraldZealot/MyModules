@@ -24,11 +24,57 @@
 using namespace std;
 using namespace hzw;
 
+class Mems
+{
+   int *mem_;
+public:
+   Mems(int a, int b):
+      mem_(0)
+   {
+      mem_ = new int[2]();
+      mem_[0] = a;
+      mem_[1] = b;
+   }
+
+   Mems(const Mems &original):
+      mem_(0)
+   {
+      mem_ = new int[2]();
+      mem_[0] = original.mem_[0];
+      mem_[1] = original.mem_[1];
+   }
+
+   ~Mems()
+   {
+      mem_[0] = 0;
+      mem_[1] = 0;
+      delete [] mem_;
+      mem_ = 0;
+   }
+};
+
 class Int
 {
    int data_;
+   Mems *mems_;
 public:
-   Int(int value):data_(value){};
+   Int(const Int &original):
+      data_(original.data_),
+      mems_(0)
+   {
+      mems_ = new Mems(*original.mems_);
+   }
+   Int(int value):
+      data_(value),
+      mems_(0)
+   {
+      mems_ = new Mems(2, 3);
+   };
+   ~Int()
+   {
+      delete mems_;
+      mems_ = 0;
+   }
    bool operator!=(const Int &b){return data_!=b.data_;}
    bool operator==(const Int &b){return data_==b.data_;}
    bool operator<(const Int &b){return data_<b.data_;}
@@ -110,7 +156,7 @@ int main()
          a.excludeCurrent();
       }
 
-      cout << "ring a: " << a << endl;
+      cout << "ring a: " << a << endl;/**/
    }
    catch(exception &e)
    {

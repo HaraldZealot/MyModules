@@ -24,6 +24,8 @@
 #define RING_H
 
 #include <exception>
+#include <iostream>
+#include <new>
 
 /*!
  * \namespace hzw
@@ -52,6 +54,8 @@ namespace hzw
     * \return Integer value, that corresponds to some comparability.
     */
    typedef int (*FuncCompare)(const void *, const void *);
+   typedef void *(*FuncConstructor)(void *, const void *);
+   typedef void (*FuncDestructor)(void *);
 
    class RingVoid;
 
@@ -162,16 +166,13 @@ namespace hzw
       //! N.B! This function can't be inline i.e. they need pointer to this function.
       //! \return -1 when a<b, 0 when a==b and 1 when a>b/
       static int cmp(const void *a, const void *b);
+      static void *dataConstructor(void *memoryArea, const void *original);
+      static void dataDestructor(void *object);
 
       // Pointer to implementation aka Cheshire Cat patern
       RingVoid *pimpl_;
       // Service construcror
       inline Ring(const RingVoid &original);
-      void dataConstructor(void *p2O, const void *original)
-      {
-         Data *temp=new Data(*(Data *)original);
-         //((Data *)p2O)->Data(*(Data *)original);
-      }
    };
 
    //! \privatesection
@@ -192,8 +193,9 @@ namespace hzw
    {
    private:
       template<class T> friend class Ring;
-      RingVoid(FuncCompare cmp);
-      RingVoid(FuncCompare cmp, const void *dataAdress, int dataSize, int count = 1);
+      RingVoid(FuncCompare cmp, FuncConstructor ctor, FuncDestructor dtor);
+      RingVoid(FuncCompare cmp, FuncConstructor ctor, FuncDestructor dtor,
+               const void *dataAdress, int dataSize, int count = 1);
       RingVoid(const RingVoid &original);
       RingVoid &operator=(const RingVoid &rightOperand);
       ~RingVoid();
@@ -214,14 +216,13 @@ namespace hzw
       class RingImplementation;
       RingVoid(const RingImplementation &original);
       RingImplementation *pimpl_;
-      FuncCompare cmp_;
    };
 
    template <typename T>
    Ring<T>::Ring():
       pimpl_(0)
    {
-      pimpl_ = new RingVoid((FuncCompare)&hzw::Ring<T>::cmp);
+      pimpl_ = new RingVoid((FuncCompare)&hzw::Ring<T>::cmp,dataConstructor,dataDestructor);
    }
 
 
@@ -229,16 +230,14 @@ namespace hzw
    Ring<T>::Ring(const T &element):
       pimpl_(0)
    {
-      unsigned char *bufer = new unsigned char[sizeof(T)];
-      dataConstructor((void *)bufer,(const void *)&element);
-      pimpl_ = new RingVoid((FuncCompare)hzw::Ring<T>::cmp, (void *)&element, sizeof(T));
+      pimpl_ = new RingVoid(cmp,dataConstructor,dataDestructor, (void *)&element, sizeof(T));
    }
 
    template <typename T>
    Ring<T>::Ring(const T elements[], int count):
       pimpl_(0)
    {
-      pimpl_ = new RingVoid((FuncCompare)&hzw::Ring<T>::cmp, (void *)elements, sizeof(T), count);
+      pimpl_ = new RingVoid(cmp,dataConstructor,dataDestructor, (void *)elements, sizeof(T), count);
    }
 
 
@@ -351,6 +350,18 @@ namespace hzw
    int Ring<T>::cmp(const void *a, const void *b)
    {
       return *((T *)a) == *((T *)b) ? 0 : (*((T *)a) < * ((T *)b) ? -1 : 1);
+   }
+
+   template <typename T>
+   void *Ring<T>::dataConstructor(void *memoryArea, const void *original)
+   {
+      return new(memoryArea) T(*(T *)original);
+   }
+
+   template <typename T>
+   void Ring<T>::dataDestructor(void *object)
+   {
+      ((T *)object)->~T();
    }
 }
 
